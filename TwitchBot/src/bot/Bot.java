@@ -199,7 +199,7 @@ public class Bot
                     String message = line.substring(chatUsername.length()*3 + channel.length() + 29);
 
                     // last seen
-                    if (message.trim().startsWith("!seen") && ls.isAvailable()) {
+                    if (message.trim().toLowerCase().startsWith("!seen") && ls.isAvailable()) {
                         String response;
                         String[] msgTokens = message.split(" ");
                         if (msgTokens.length < 2) {
@@ -213,10 +213,10 @@ public class Bot
                     }
 
                     // stalk
-                    if (message.trim().startsWith("!stalk") && ls.isAvailable()) {
+                    if (message.trim().toLowerCase().startsWith("!stalk") && ls.isAvailable()) {
                         // Because I'm not a mod
                         try {
-                            Thread.sleep(1200);
+                            Thread.sleep(1500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
