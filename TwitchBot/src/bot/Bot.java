@@ -63,8 +63,7 @@ public class Bot
     /** Current connected channel. */
     private String channel;
 
-
-    private static final Logger logger = Logger.getLogger(Bot.class.getName());
+    private static final Logger bugLogger = Logger.getLogger(Bot.class.getName());
 
 
     /**
@@ -113,14 +112,14 @@ public class Bot
             this.writer.flush();
             // file handler for bug logging in general
             bfh = new FileHandler(LOG_PATH + "BugLog.txt", true);
-            logger.addHandler(bfh);
+            bugLogger.addHandler(bfh);
             bfh.setFormatter(new SimpleFormatter());
             bfh.setEncoding("UTF-8");
 
             String line = "";
             // take greeting lines
             while ((line = this.reader.readLine()) != null) {
-                logger.log(Level.INFO, line);
+                bugLogger.log(Level.INFO, line);
                 if (line.contains("376"))
                     break;
             }
@@ -147,7 +146,7 @@ public class Bot
         {
             e.printStackTrace();
         }
-        logger.log(Level.INFO, "> MSG " + channel + " :" + "> " + message);
+        bugLogger.log(Level.INFO, "> MSG " + channel + " :" + "> " + message);
     }
 
 
@@ -177,21 +176,18 @@ public class Bot
                 {
                     this.writer.write("PING :tmi.twitch.tv\r\n");
                     this.writer.flush();
-                    logger.log(Level.INFO, "< PING");
                     runTime = System.currentTimeMillis();
                     idle = false;
                 }
 
                 if (line == null) 
                 {
-                    logger.log(Level.INFO, "> Disconnected from server!");
+                    bugLogger.log(Level.INFO, "> Disconnected from server!");
                     break;
                 }
                 else if (line.toLowerCase().startsWith("ping")) // respond to server ping
                 {
-                    logger.log(Level.INFO, "> PING");
                     this.writer.write("PONG :" + line.substring(6) + "\r\n");
-                    logger.log(Level.INFO, "< PONG");
                 }             
                 else if (line.contains("PRIVMSG")) // respond to chat activity 
                 {
@@ -212,8 +208,8 @@ public class Bot
                         sendMessage(response, channel);
                     }
 
-                    // stalk
-                    if (message.trim().toLowerCase().startsWith("!stalk") && ls.isAvailable()) {
+                    // logs
+                    if (message.trim().toLowerCase().startsWith("!logs") && ls.isAvailable()) {
                         // Because I'm not a mod
                         try {
                             Thread.sleep(1500);
@@ -249,7 +245,9 @@ public class Bot
                 }
                 else 
                 {
-                    logger.log(Level.INFO, "> " + line); // log other server messages
+                    if (line.replace("tmi.twitch.tv", "").replace(":", "").trim().equals("PONG")) {
+                        bugLogger.log(Level.INFO, "> " + line); // log other server messages
+                    }
                 }   
             }      
         }
@@ -278,7 +276,7 @@ public class Bot
 
             this.writer.write("JOIN #" + channel.toLowerCase() + " \r\n");
             this.writer.flush();
-            logger.log(Level.INFO, "> JOIN " + channel);
+            bugLogger.log(Level.INFO, "> JOIN " + channel);
         }
         catch (IOException e)
         {
@@ -295,21 +293,5 @@ public class Bot
     public String getName() 
     {
         return username;
-    }
-
-
-    /**
-     * Reconnect to server in case of errors
-     * 
-     * WIP
-     */
-    public void reconnect() {
-        int delay = 30; // in seconds
-
-        try {
-
-        } catch (Exception e) {
-
-        }
     }
 }
